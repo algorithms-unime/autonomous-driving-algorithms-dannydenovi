@@ -10,6 +10,7 @@ import random
 import signal
 import sys
 import uuid
+import configparser
 from collections import deque
 
 import cv2
@@ -31,6 +32,9 @@ img_channels = 4  # We stack 4 frames
 class DQNAgent:
     def __init__(self, state_size, action_space, train=True):
         self.t = 0
+        self.episode_shift = 0
+
+
         self.max_Q = 0
         self.train = train
 
@@ -146,7 +150,17 @@ class DQNAgent:
         self.model.train_on_batch(state_t, targets)
 
     def load_model(self, name):
+
+        configP = configparser.ConfigParser()
+        configP.read('config.ini')
+        self.t = int(configP["latest_run"]["timestep"])
+        self.epsilon = float(configP["latest_run"]["epsilon"])
+        self.max_Q = float(configP["latest_run"]["max_Q"])
+        self.episode_shift = int(configP["latest_run"]["episode"])
+
         self.model.load_weights(name)
+        
+
 
     # Save the model which is under training
     def save_model(self, name):
@@ -202,6 +216,8 @@ def run_ddqn(args):
     config.gpu_options.allow_growth = True
     sess = tf.Session(config=config)
     K.set_session(sess)
+    configP = configparser.ConfigParser()
+
 
     conf = {
             "exe_path": args.sim,
@@ -218,6 +234,9 @@ def run_ddqn(args):
             "max_cte": 10,
         }
 
+    # TENSORBOARD SETTINGS
+    log_dir = "ddqn_donkeycar_tensorboard"
+    summary_writer = tf.summary.FileWriter(log_dir)
 
     # Construct gym environment. Starts the simulator if path is given.
     env = gym.make(args.env_name, conf=conf)
@@ -249,7 +268,7 @@ def run_ddqn(args):
 
         for e in range(EPISODES):
 
-            print("Episode: ", e)
+            print("Episode: ", e + agent.episode_shift)
 
             done = False
             obs = env.reset()
@@ -261,6 +280,8 @@ def run_ddqn(args):
             s_t = np.stack((x_t, x_t, x_t, x_t), axis=2)
             # In Keras, need to reshape
             s_t = s_t.reshape(1, s_t.shape[0], s_t.shape[1], s_t.shape[2])  # 1*80*80*4
+
+
 
             while not done:
 
@@ -284,10 +305,25 @@ def run_ddqn(args):
                 s_t = s_t1
                 agent.t = agent.t + 1
                 episode_len = episode_len + 1
+
+                # create a summary for tensorboard
+                summary = tf.Summary()
+                summary.value.add(tag="episode_length", simple_value=float(episode_len))
+                summary.value.add(tag="epsilon", simple_value=float(agent.epsilon))
+                summary.value.add(tag="max_Q", simple_value=float(agent.max_Q))
+                summary.value.add(tag="reward", simple_value=float(reward))
+                summary_writer.add_summary(summary, agent.t)
+
+                configP["latest_run"] = {"timestep": str(agent.t), "episode": str(e + agent.episode_shift),  "epsilon": str(agent.epsilon), "max_Q": str(agent.max_Q)}
+
+                with open('config.ini', 'w') as configfile:
+                    configP.write(configfile)
+                
+
                 if agent.t % 30 == 0:
                     print(
                         "EPISODE",
-                        e,
+                        (e + agent.episode_shift),
                         "TIMESTEP",
                         agent.t,
                         "/ ACTION",
@@ -311,6 +347,7 @@ def run_ddqn(args):
                     if agent.train:
                         agent.save_model(args.model)
 
+
                     print(
                         "episode:",
                         e,
@@ -326,6 +363,8 @@ def run_ddqn(args):
         print("stopping run...")
     finally:
         env.unwrapped.close()
+        # Close the summary writer
+        summary_writer.close()
 
 
 if __name__ == "__main__":

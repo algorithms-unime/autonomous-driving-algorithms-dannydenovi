@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-DDQN
-    image: rl-donkeycar
+    image: ddqn-donkeycar
     ports:
       - "6006:6006"
     volumes:

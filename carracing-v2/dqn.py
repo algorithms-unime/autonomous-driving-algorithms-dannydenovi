@@ -15,7 +15,7 @@ def retrain(step, loaded_model):
     env = gym.make("CarRacing-v2", domain_randomize=False, continuous=False)
     model = DQN.load(loaded_model , env, verbose=1, tensorboard_log="./tensorboard/")
     model.learn(total_timesteps=step, reset_num_timesteps=False, tb_log_name="dqn")
-    model.save("dqn_model")
+    model.save(loaded_model)
 
 
 def test(loaded_model):

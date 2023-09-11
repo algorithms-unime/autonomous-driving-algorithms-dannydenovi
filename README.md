@@ -6,7 +6,7 @@
 
 ## Introduzione
 
-Questa repository contiene il necessario per riprodurre l'esperimento condotto su donkeycar e CarRacing-v2 e discusso nella tesi.
+Questa repository contiene il necessario per riprodurre l'esperimento condotto su Donkeycar e CarRacing-v2 e discusso nella tesi.
 
 ### Abstract
 

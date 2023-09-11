@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  ddqn-donkeycar:
+    container_name: ddqn-donkeycar
+    build:
+      context: .
+      dockerfile: Dockerfile-DDQN
+    image: ddqn-donkeycar
+    ports:
+      - "6006:6006"
+    volumes:
+      - ./donkeycar:/app/
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

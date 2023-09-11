@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  ppo-donkeycar:
+    container_name: ppo-donkeycar
+    build:
+      context: .
+      dockerfile: Dockerfile-PPO
+    image: ppo-donkeycar
+    ports:
+      - "6006:6006"
+    volumes:
+      - ./donkeycar:/app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

@@ -95,7 +95,7 @@ python3 <ppo.py|dqn.py> --train [--steps numero_steps]
 Per rieseguire il training bisogna lanciare: 
 
 ```bash
-python3 <ppo.py|dqn.py> --test [--steps numero_steps] [--model nome_modello]
+python3 <ppo.py|dqn.py> --retrain [--steps numero_steps] [--model nome_modello]
 ```
 
 Per testare l'agente basterà eseguire: 

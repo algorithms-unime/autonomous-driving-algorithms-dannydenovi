@@ -1,7 +1,7 @@
 # Università degli Studi di Messina
 
 **Studente**: Danny De Novi</br>
-**Titolo della tesi**: Studio e implementazione di algoritmi di Reinforcement Learning nella guida autonoma</br>
+**Titolo della tesi**: Implementazione e analisi di algoritmi di Reinforcement Learning nella guida autonoma: confronto tra PPO, DQN e DDQN in environnment 2D e 3D</br>
 **Relatore**: Lorenzo Carnevale</br>
 
 ## Introduzione
